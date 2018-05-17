@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>統聯1659客運資訊</title>
+		<script type="text/javascript" src="sha1.js"></script>
+		<script>
+		window.addEventListener('load', function(){
+			const ROUTE_NAME = {'16590': '1659A', '1659A':'1659B', '1659B':'1659C'};
+			getPtx(
+				"https://ptx.transportdata.tw/MOTC/v2/Bus/EstimatedTimeOfArrival/InterCity/1659?$filter=StopID%20eq%20'297108'&$format=JSON", 
+				function(_result){
+					const result = JSON.parse(_result);
+					let estimate = [];
+					for(let i=0;i<result.length;i++){
+						let text = '';
+						if(result[i]['PlateNumb'] == '-1'){
+							text = getStatus(result[i]['StopStatus']);
+						}else{
+							if(result[i]['EstimateTime'] > 60){
+								text = Math.ceil(result[i]['EstimateTime']/60)+'分後到'+result[i]['StopName']['Zh_tw'];
+							}else{
+								text = '1分鐘內到'+result[i]['StopName']['Zh_tw'];
+							}
+						}
+						estimate.push({
+							name: ROUTE_NAME[result[i]['SubRouteName']['Zh_tw']],
+							text: text
+						});
+					}
+					showResult(estimate);
+				},
+				function(){console.log('failed');},
+				10000,
+				function(){console.log('timeout');}
+			);
+			
+			document.getElementById('refresh').addEventListener('click', function(){
+				window.location.reload();
+			});
+		});
+		function showResult(estimate){
+			let content = '';
+			for(let i=0;i<estimate.length;i++){
+				content += '<div class="info_row"><div class="info_name">'+estimate[i]['name'] + '</div><div class="info_text">' + estimate[i]['text']+'</div></div>';
+			}
+			document.getElementById('estimate_info').innerHTML = content;
+		}		
+		function getStatus(status){
+			if(status === 1){
+				return '尚未發車';
+			}else if(status === 2){
+				return '交管不停靠';
+			}else if(status === 3){
+				return '末班車已過';
+			}else if(status === 4){
+				return '今日未營運';
+			}
+		}
+		function getPtx(url, success, failed, timeout, onTimeout){
+			let xhr = new XMLHttpRequest();			
+			xhr.open('GET', url, true);
+			let header = GetAuthorizationHeader();
+			xhr.setRequestHeader('Authorization', header['Authorization']);
+			xhr.setRequestHeader('X-Date', header['X-Date']);
+			if(timeout != undefined && onTimeout != undefined){
+				xhr.timeout = timeout; // time in milliseconds
+				xhr.ontimeout = function (e) {
+				  (onTimeout && typeof(onTimeout) === "function") && onTimeout(xhr.responseText);
+				};
+			}else{
+				xhr.timeout = 10000; // time in milliseconds
+			}
+			xhr.onload = function() {
+			    if (xhr.status === 200) {
+			        (success && typeof(success) === "function") && success(xhr.responseText);
+			    }
+			    else {
+			        (failed && typeof(failed) === "function") && failed();
+			    }
+			};
+			xhr.send();
+		}
+		function GetAuthorizationHeader() {
+		    let AppID = 'FFFFFFFF-FFFF-FFFF-FFFF-FFFFFFFFFFFF';
+		    let AppKey = 'FFFFFFFF-FFFF-FFFF-FFFF-FFFFFFFFFFFF';
+
+		    let GMTString = new Date().toGMTString();
+		    let ShaObj = new jsSHA('SHA-1', 'TEXT');
+		    ShaObj.setHMACKey(AppKey, 'TEXT');
+		    ShaObj.update('x-date: ' + GMTString);
+		    let HMAC = ShaObj.getHMAC('B64');
+		    let Authorization = 'hmac username=\"' + AppID + '\", algorithm=\"hmac-sha1\", headers=\"x-date\", signature=\"' + HMAC + '\"';
+
+		    return { 'Authorization': Authorization, 'X-Date': GMTString /*,'Accept-Encoding': 'gzip'*/}; //如果要將js運行在伺服器，可額外加入 'Accept-Encoding': 'gzip'，要求壓縮以減少網路傳輸資料量
+		}
+		</script>
+		<style>
+		html{
+			height: 100%;
+			background: -webkit-linear-gradient(#A9B0EE,#49A9EB);
+		}
+		body{
+			padding: 0;
+		}
+		body *{
+			text-align: center;
+		}
+		.info_row{
+			padding: .5em;
+		}
+		.info_name{
+			display: inline-block;
+			width: 50%;
+		}
+		.info_text{
+			display: inline-block;
+			width: 50%;
+		}
+		footer{
+			position: absolute;
+			left: 0;
+			bottom: 1em;
+			padding: 0;
+			margin-left: .5em;
+			margin-right: .5em;
+			text-align: left;
+		}
+		</style>
+	</head>
+	<body>
+		<center>
+			<h1>1659客運資訊</h1>
+		</center>
+		<div id="estimate_info">讀取中...</div>
+		<div>
+			<input id="refresh" type="button" value="重新整理" />
+		</div>
+		<footer>
+			<p>資料來源: <a href="https://ptx.transportdata.tw/PTX">交通部PTX平台</a></p>
+			<p>此網頁是站長為了快速知道住家附近客運時間而製作，歡迎有公車資訊、公車即時動態需求的朋友，可以聯絡站長接案開發喔</p>			
+			聯絡資訊:&nbsp;<a href="mailto:guavacheck@gmail.com">guavacheck@gmail.com</a><br />
+			Blog:&nbsp;<a href="http://z29591259.esy.es">芭樂票寫程式</a>
+		</footer>
+	</body>
+</html>
