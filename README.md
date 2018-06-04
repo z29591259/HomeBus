@@ -2,6 +2,8 @@
 
 Show the inter city bus estimated time of arrival near my home.
 
+Demo Page: [統聯1659客運資訊](http://z29591259.esy.es/homebus/)
+
 Data sourece: [PTX (Public Transport Data eXchange)](http://ptx.transportdata.tw/PTX)
 
 Use native javascript ajax to get json data from PTX Web API, and show different time unit depend on the seconds.
