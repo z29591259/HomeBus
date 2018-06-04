@@ -3,13 +3,14 @@
 	<head>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<link rel="manifest" href="manifest.json">
 		<title>統聯1659客運資訊</title>
 		<script type="text/javascript" src="sha1.js"></script>
 		<script>
 		window.addEventListener('load', function(){
 			const ROUTE_NAME = {'16590': '1659A', '1659A':'1659B', '1659B':'1659C'};
 			getPtx(
-				"https://ptx.transportdata.tw/MOTC/v2/Bus/EstimatedTimeOfArrival/InterCity/1659?$filter=StopID%20eq%20'297108'&$format=JSON", 
+				"http://ptx.transportdata.tw/MOTC/v2/Bus/EstimatedTimeOfArrival/InterCity/1659?$filter=StopID%20eq%20'297108'&$format=JSON", 
 				function(_result){
 					const result = JSON.parse(_result);
 					let estimate = [];
@@ -31,7 +32,7 @@
 					}
 					showResult(estimate);
 				},
-				function(){console.log('failed');},
+				function(msg){console.log(msg);},
 				10000,
 				function(){console.log('timeout');}
 			);
@@ -39,7 +40,44 @@
 			document.getElementById('refresh').addEventListener('click', function(){
 				window.location.reload();
 			});
+			
+			if ('serviceWorker' in navigator) {
+			  //console.log("Will the service worker register?");
+			  navigator.serviceWorker.register('service-worker.js')
+			    .then(function(reg){
+			      //console.log("Yes, it did.");
+			    }).catch(function(err) {
+			      //console.log("No it didn't. This happened: ", err)
+			    });
+			}
+						
+			let btnAddHomescreen = document.getElementById('add_homescreen');
+			btnAddHomescreen.addEventListener('click', (e) => {
+			  // hide our user interface that shows our A2HS button
+			  btnAddHomescreen.style.display = 'none';
+			  // Show the prompt
+			  deferredPrompt.prompt();
+			  // Wait for the user to respond to the prompt
+			  deferredPrompt.userChoice
+			    .then((choiceResult) => {
+			      if (choiceResult.outcome === 'accepted') {
+			        console.log('User accepted the A2HS prompt');
+			      } else {
+			        console.log('User dismissed the A2HS prompt');
+			      }
+			      deferredPrompt = null;
+			    });
+			});
 		});
+		
+		let deferredPrompt;
+		window.addEventListener('beforeinstallprompt', (e) => {
+		  e.preventDefault();
+		  deferredPrompt = e;
+		  // Update UI notify the user they can add to home screen
+		  btnAddHomescreen.style.display = 'block';
+		});
+		
 		function showResult(estimate){
 			let content = '';
 			for(let i=0;i<estimate.length;i++){
@@ -77,7 +115,7 @@
 			        (success && typeof(success) === "function") && success(xhr.responseText);
 			    }
 			    else {
-			        (failed && typeof(failed) === "function") && failed();
+			        (failed && typeof(failed) === "function") && failed(xhr.statusText);
 			    }
 			};
 			xhr.send();
@@ -107,6 +145,9 @@
 		body *{
 			text-align: center;
 		}
+		#add_homescreen{
+			display: none;
+		}
 		.info_row{
 			padding: .5em;
 		}
@@ -135,7 +176,8 @@
 		</center>
 		<div id="estimate_info">讀取中...</div>
 		<div>
-			<input id="refresh" type="button" value="重新整理" />
+			<input id="refresh" type="button" value="重新整理" />&nbsp;
+			<input id="add_homescreen" type="button" value="新增到桌面"/>
 		</div>
 		<footer>
 			<p>資料來源: <a href="https://ptx.transportdata.tw/PTX">交通部PTX平台</a></p>

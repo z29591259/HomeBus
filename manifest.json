@@ -1,0 +1,21 @@
+{
+  "short_name": "1659",
+  "name": "1659 bus info",
+  "icons": [
+    {
+      "src": "1659-192.png",
+      "type": "image/png",
+      "sizes": "192x192"
+    },
+    {
+      "src": "1659-512.png",
+      "type": "image/png",
+      "sizes": "512x512"
+    }
+  ],
+  "start_url": "./demo/homebus/index.html?source=app",
+  "scope": "./homebus/",
+  "background_color": "#3367D6",
+  "display": "standalone",
+  "theme_color": "#3367D6"
+}
