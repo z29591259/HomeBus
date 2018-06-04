@@ -13,8 +13,8 @@
       "sizes": "512x512"
     }
   ],
-  "start_url": "./demo/homebus/index.html?source=app",
-  "scope": "./homebus/",
+  "start_url": "./index.html?source=app",
+  "scope": "./",
   "background_color": "#3367D6",
   "display": "standalone",
   "theme_color": "#3367D6"
