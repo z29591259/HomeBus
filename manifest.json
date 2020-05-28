@@ -1,14 +1,14 @@
 {
-  "short_name": "1659",
-  "name": "1659 bus info",
+  "short_name": "一鍵公車",
+  "name": "一鍵公車",
   "icons": [
     {
-      "src": "1659-192.png",
+      "src": "icon-192.png",
       "type": "image/png",
       "sizes": "192x192"
     },
     {
-      "src": "1659-512.png",
+      "src": "icon-512.png",
       "type": "image/png",
       "sizes": "512x512"
     }
