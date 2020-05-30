@@ -17,25 +17,7 @@
 			.then(res => {
 			    return res.json();
 			}).then(result => {
-			    let estimate = [];
-				for(let i=0;i<result.length;i++){
-					let text = '';
-					if(result[i]['PlateNumb'] == '-1' || result[i]['PlateNumb'] == ''){
-						text = getStatus(result[i]['StopStatus'], result[i]['NextBusTime']);
-					}else{
-						if(result[i]['EstimateTime'] > 60){
-							text = Math.ceil(result[i]['EstimateTime']/60)+'分後到'+result[i]['StopName']['Zh_tw'];
-						}else{
-							text = '1分鐘內到'+result[i]['StopName']['Zh_tw'];
-						}
-					}
-					estimate.push({
-						name: result[i]['SubRouteName']['Zh_tw'],
-						no: result[i]['PlateNumb'],
-						text: text
-					});
-				}
-				showResult(estimate);
+			    parseData(result);
 			})
 			.catch(function(err) {
 			    alert(err);
@@ -82,13 +64,37 @@
 		  btnAddHomescreen.style.display = 'block';
 		});
 		
+		function parseData(result){
+			let estimate = [];
+			for(let i=0;i<result.length;i++){
+				let text = '';
+				if(result[i]['PlateNumb'] == '-1' || result[i]['PlateNumb'] == ''){
+					text = getStatus(result[i]['StopStatus'], result[i]['NextBusTime']);
+				}else{
+					if(result[i]['EstimateTime'] > 60){
+						text = Math.ceil(result[i]['EstimateTime']/60)+'分後';
+					}else{
+						text = '1分鐘內';
+					}
+				}
+				estimate.push({
+					route: result[i]['SubRouteName']['Zh_tw'],
+					no: result[i]['PlateNumb'],
+					text: text,
+					stop: result[i]['StopName']['Zh_tw']
+				});
+			}
+			showResult(estimate);
+		}
+		
 		function showResult(estimate){
 			let content = '';
 			for(let i=0;i<estimate.length;i++){
 				content += '<div class="info_row">'+
-					'<div class="info_name">'+estimate[i]['name'] + '</div>'+
+					'<div class="info_route">'+estimate[i]['route'] + '</div>'+
 					'<div class="info_no">'+estimate[i]['no']+'</div>'+
 					'<div class="info_text">' + estimate[i]['text']+'</div>'+
+					'<div class="info_stop">' + estimate[i]['stop']+'</div>'+
 				'</div>';
 			}
 			document.getElementById('estimate_info').innerHTML = content;
@@ -125,9 +131,9 @@
 		.info_row{
 			padding: .5em 0;
 		}
-		.info_name{
+		.info_route{
 			display: inline-block;
-			width: 25%;
+			width: 15%;
 		}
 		.info_no{
 			display: inline-block;
@@ -135,7 +141,11 @@
 		}
 		.info_text{
 			display: inline-block;
-			width: 45%;
+			width: 25%;
+		}
+		.info_stop{
+			display: inline-block;
+			width: 30%;
 		}
 		footer{
 			position: absolute;
