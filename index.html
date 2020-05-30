@@ -21,7 +21,7 @@
 				for(let i=0;i<result.length;i++){
 					let text = '';
 					if(result[i]['PlateNumb'] == '-1' || result[i]['PlateNumb'] == ''){
-						text = getStatus(result[i]['StopStatus']);
+						text = getStatus(result[i]['StopStatus'], result[i]['NextBusTime']);
 					}else{
 						if(result[i]['EstimateTime'] > 60){
 							text = Math.ceil(result[i]['EstimateTime']/60)+'分後到'+result[i]['StopName']['Zh_tw'];
@@ -31,6 +31,7 @@
 					}
 					estimate.push({
 						name: result[i]['SubRouteName']['Zh_tw'],
+						no: result[i]['PlateNumb'],
 						text: text
 					});
 				}
@@ -84,13 +85,20 @@
 		function showResult(estimate){
 			let content = '';
 			for(let i=0;i<estimate.length;i++){
-				content += '<div class="info_row"><div class="info_name">'+estimate[i]['name'] + '</div><div class="info_text">' + estimate[i]['text']+'</div></div>';
+				content += '<div class="info_row">'+
+					'<div class="info_name">'+estimate[i]['name'] + '</div>'+
+					'<div class="info_no">'+estimate[i]['no']+'</div>'+
+					'<div class="info_text">' + estimate[i]['text']+'</div>'+
+				'</div>';
 			}
 			document.getElementById('estimate_info').innerHTML = content;
 		}		
-		function getStatus(status){
+		function getStatus(status, next_time){
 			if(status === 1){
-				return '尚未發車';
+				var time = new Date(next_time);
+				var hour = time.getHours() < 10 ? '0'+time.getHours() : time.getHours();
+				var minute = time.getMinutes() < 10 ? '0'+time.getMinutes() : time.getMinutes();
+				return hour + ':' + minute + '發車';
 			}else if(status === 2){
 				return '交管不停靠';
 			}else if(status === 3){
@@ -115,19 +123,24 @@
 			display: none;
 		}
 		.info_row{
-			padding: .5em;
+			padding: .5em 0;
 		}
 		.info_name{
 			display: inline-block;
-			width: 50%;
+			width: 25%;
+		}
+		.info_no{
+			display: inline-block;
+			width: 30%;
 		}
 		.info_text{
 			display: inline-block;
-			width: 50%;
+			width: 45%;
 		}
 		footer{
 			position: absolute;
-			left: 0;
+			left: 50%;
+    		transform: translateX(-50%);
 			bottom: 1em;
 			padding: 0;
 			margin-left: .5em;
@@ -146,9 +159,8 @@
 			<input id="add_homescreen" type="button" value="新增到桌面"/>
 		</div>
 		<footer>
-			<p>資料來源: <a href="https://ptx.transportdata.tw/PTX">交通部PTX平台</a></p>
-			<p>此網頁是站長為了快速知道住家附近客運時間而製作，歡迎有公車資訊、公車即時動態需求的朋友，可以聯絡站長接案開發喔</p>			
-			聯絡資訊:&nbsp;<a href="mailto:admin@woodloch.blog">admin@woodloch.blog</a><br />
+			資料來源:&nbsp;<a href="https://ptx.transportdata.tw/PTX">交通部PTX平台</a>
+			Email:&nbsp;<a href="mailto:admin@woodloch.blog">admin@woodloch.blog</a><br />
 			Blog:&nbsp;<a href="https://woodloch.blog">木澤的研發腦</a>&nbsp;&nbsp;<a href="https://github.com/z29591259/HomeBus">GitHub</a>
 		</footer>
 	</body>
