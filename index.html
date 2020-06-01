@@ -3,29 +3,14 @@
 	<head>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-		<link rel="manifest" href="manifest.json">
-		<title>八德惠爾得公車資訊</title>
+		<link rel="manifest" href="manifest.json" />
+		<link rel="stylesheet" href="nav.css" />
+		<title>一鍵公車</title>
 		<script>
-		const url = 'https://script.google.com/macros/s/AKfycbxVH6wsfiRs_u-GSLVKVoENVX_SfJ7wUSFEqTB_hDFleA4NzEY/exec?key=7dKw1ubRxz4EtL2EuN5ZWKZPT9GBeL6T';
+		const REFRESH_PERIOD = 60*1000;
+		const DATA_URL = 'https://script.google.com/macros/s/AKfycbxVH6wsfiRs_u-GSLVKVoENVX_SfJ7wUSFEqTB_hDFleA4NzEY/exec?key=7dKw1ubRxz4EtL2EuN5ZWKZPT9GBeL6T';
 		window.addEventListener('load', function(){
-			fetch(url,{
-  			  method:'GET',
-			  headers: {
-			    'Content-Type': 'application/x-www-form-urlencoded; charset=utf-8'
-			  }
-			})
-			.then(res => {
-			    return res.json();
-			}).then(result => {
-			    parseData(result);
-			})
-			.catch(function(err) {
-			    alert(err);
-			});
-			
-			document.getElementById('refresh').addEventListener('click', function(){
-				window.location.reload();
-			});
+			loadData();
 			
 			if ('serviceWorker' in navigator) {
 			  //console.log("Will the service worker register?");
@@ -54,6 +39,18 @@
 			      deferredPrompt = null;
 			    });
 			});
+			
+			//intial nav
+			const jsMenuNode = document.querySelector('.menu');
+	  		const demoMenu = new Menu ({
+	    		menuNode: jsMenuNode
+	  		});
+	  
+	  		function callMenuToggle(event) {
+	    		demoMenu.toggleMenuState('menu_activated');
+	  		}
+	  
+	  		jsMenuNode.querySelector('.menu__hamburger').addEventListener('click', callMenuToggle);
 		});
 		
 		let deferredPrompt;
@@ -63,6 +60,25 @@
 		  // Update UI notify the user they can add to home screen
 		  btnAddHomescreen.style.display = 'block';
 		});
+		
+		function loadData(){
+			fetch(DATA_URL,{
+  			  method:'GET',
+			  headers: {
+			    'Content-Type': 'application/x-www-form-urlencoded; charset=utf-8'
+			  }
+			})
+			.then(res => {
+			    return res.json();
+			}).then(result => {
+			    parseData(result);
+			    setTimeout(function(){loadData()}, REFRESH_PERIOD);
+			})
+			.catch(function(err) {
+			    alert(err);
+			    setTimeout(function(){loadData()}, REFRESH_PERIOD);
+			});
+		}
 		
 		function parseData(result){
 			let estimate = [];
@@ -113,6 +129,20 @@
 				return '今日未營運';
 			}
 		}
+		
+		//from https://codepen.io/melnik909/pen/JpJPYp
+		class Menu {
+    		constructor(settings) {
+      			this.menuNode = settings.menuNode;
+    		}
+    
+    		toggleMenuState(className) {      
+      	  		if (typeof className !== 'string' || className.length === 0) {
+          			return console.log('you did not give the class for toggleState function');
+      			} 
+      			return  this.menuNode.classList.toggle(className);
+    		}
+  		}
 		</script>
 		<style>
 		html{
@@ -124,6 +154,9 @@
 		}
 		body *{
 			text-align: center;
+		}
+		h1{
+			margin: 0.2em 0;
 		}
 		#add_homescreen{
 			display: none;
@@ -137,41 +170,52 @@
 		}
 		.info_no{
 			display: inline-block;
-			width: 30%;
+			width: 25%;
 		}
 		.info_text{
 			display: inline-block;
-			width: 25%;
+			width: 30%;
 		}
 		.info_stop{
 			display: inline-block;
 			width: 30%;
 		}
-		footer{
-			position: absolute;
-			left: 50%;
-    		transform: translateX(-50%);
-			bottom: 1em;
-			padding: 0;
-			margin-left: .5em;
-			margin-right: .5em;
-			text-align: left;
-		}
 		</style>
 	</head>
 	<body>
+	<div class="page">
 		<center>
-			<h1>八德惠爾得公車資訊</h1>
+			<h1>一鍵公車</h1>
 		</center>
 		<div id="estimate_info">讀取中...</div>
 		<div>
-			<input id="refresh" type="button" value="重新整理" />&nbsp;
 			<input id="add_homescreen" type="button" value="新增到桌面"/>
 		</div>
-		<footer>
-			資料來源:&nbsp;<a href="https://ptx.transportdata.tw/PTX">交通部PTX平台</a>
-			Email:&nbsp;<a href="mailto:admin@woodloch.blog">admin@woodloch.blog</a><br />
-			Blog:&nbsp;<a href="https://woodloch.blog">木澤的研發腦</a>&nbsp;&nbsp;<a href="https://github.com/z29591259/HomeBus">GitHub</a>
-		</footer>
+	</div>
+	<div class="menu">
+		<nav class="menu__nav">
+    		<ul class="r-list menu__list">
+	      		<li class="menu__group">
+		        	<a href="https://ptx.transportdata.tw/PTX" class="r-link menu__link">交通部PTX平台</a>
+		        </li>
+		        <li class="menu__group">
+		        	<a href="https://woodloch.blog" class="r-link menu__link">作者: 木澤</a>
+		        </li>
+		        <li class="menu__group">
+		        	<a href="https://woodlochhome.wordpress.com/2020/05/30/oneclickbus/" class="r-link menu__link">部落格</a>
+		        </li>
+		        <li class="menu__group">
+		        	<a href="mailto:admin@woodloch.blog" class="r-link menu__link">聯繫我</a>
+		        </li>
+	    	</ul>
+  		</nav>
+  		<div class="menu__toggle">
+    		<button class="r-button menu__hamburger">
+      			<span class="m-hamburger">
+        		<span class="m-hamburger__label">Open menu</span>
+      			</span>
+    		</button>
+  		</div>  
+	</div>
 	</body>
 </html>
