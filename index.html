@@ -62,6 +62,7 @@
 		});
 		
 		function loadData(){
+			document.querySelector('.loading').classList.toggle('hidden');
 			fetch(DATA_URL,{
   			  method:'GET',
 			  headers: {
@@ -72,10 +73,12 @@
 			    return res.json();
 			}).then(result => {
 			    parseData(result);
+			    document.querySelector('.loading').classList.toggle('hidden');
 			    setTimeout(function(){loadData()}, REFRESH_PERIOD);
 			})
 			.catch(function(err) {
 			    alert(err);
+			    document.querySelector('.loading').classList.toggle('hidden');
 			    setTimeout(function(){loadData()}, REFRESH_PERIOD);
 			});
 		}
@@ -180,6 +183,31 @@
 			display: inline-block;
 			width: 30%;
 		}
+		.svg-icon {
+		    fill: #fff;
+		    width: .8em;
+			height: .8em;
+			margin: .2em;
+		}
+		.loading{
+			width: 1.5em;
+			height: 1.5em;
+			position: absolute;
+			bottom: .3em;
+			right: .3em;
+			fill: black;
+			animation: spin 1.4s infinite linear;
+		}
+		.hidden { display: none; }
+		
+		@keyframes spin {
+		  0% {
+		    transform: rotate(0deg);
+		  }
+		  100% {
+		    transform: rotate(-360deg);
+		  }
+		}
 		</style>
 	</head>
 	<body>
@@ -191,21 +219,40 @@
 		<div>
 			<input id="add_homescreen" type="button" value="新增到桌面"/>
 		</div>
+		<svg class="svg-icon loading hidden" xmlns="http://www.w3.org/2000/svg">
+			<use xlink:href="icon.svg#loading"></use>
+		</svg>
 	</div>
 	<div class="menu">
 		<nav class="menu__nav">
     		<ul class="r-list menu__list">
 	      		<li class="menu__group">
-		        	<a href="https://ptx.transportdata.tw/PTX" class="r-link menu__link">交通部PTX平台</a>
+		        	<a href="https://ptx.transportdata.tw/PTX" class="r-link menu__link">
+		        		<svg class="svg-icon" xmlns="http://www.w3.org/2000/svg">
+							<use xlink:href="icon.svg#bus"></use>
+						</svg>交通部PTX
+		        	</a>
 		        </li>
 		        <li class="menu__group">
-		        	<a href="https://woodloch.blog" class="r-link menu__link">作者: 木澤</a>
+		        	<a href="https://woodloch.blog" class="r-link menu__link">
+		        		<svg class="svg-icon" xmlns="http://www.w3.org/2000/svg">
+							<use xlink:href="icon.svg#user"></use>
+						</svg>木澤
+		        	</a>
 		        </li>
 		        <li class="menu__group">
-		        	<a href="https://woodlochhome.wordpress.com/2020/05/30/oneclickbus/" class="r-link menu__link">部落格</a>
+		        	<a href="https://woodlochhome.wordpress.com/2020/05/30/oneclickbus/" class="r-link menu__link">
+		        		<svg class="svg-icon" xmlns="http://www.w3.org/2000/svg">
+							<use xlink:href="icon.svg#link"></use>
+						</svg>部落格
+		        	</a>
 		        </li>
 		        <li class="menu__group">
-		        	<a href="mailto:admin@woodloch.blog" class="r-link menu__link">聯繫我</a>
+		        	<a href="mailto:admin@woodloch.blog" class="r-link menu__link">
+		        		<svg class="svg-icon" xmlns="http://www.w3.org/2000/svg">
+							<use xlink:href="icon.svg#mail"></use>
+						</svg>聯繫我
+		        	</a>
 		        </li>
 	    	</ul>
   		</nav>
