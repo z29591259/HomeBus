@@ -4,11 +4,13 @@
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 		<link rel="manifest" href="manifest.json" />
-		<link rel="stylesheet" href="nav.css" />
+		<link rel="stylesheet" href="nav.css?v=202006041" />
 		<title>一鍵公車</title>
 		<script>
 		const REFRESH_PERIOD = 60*1000;
 		const DATA_URL = 'https://script.google.com/macros/s/AKfycbxVH6wsfiRs_u-GSLVKVoENVX_SfJ7wUSFEqTB_hDFleA4NzEY/exec?key=7dKw1ubRxz4EtL2EuN5ZWKZPT9GBeL6T';
+		const DATA_CACHE_TIME = 'data_cache_time';
+		const DATA_CACHE = 'data_cache';
 		window.addEventListener('load', function(){
 			loadData();
 			
@@ -40,6 +42,15 @@
 			    });
 			});
 			
+			//stop load when not visible,and restart when visible
+			document.addEventListener('visibilitychange', function(){
+				clearTimeout(loadTimeout);
+				if(document['hidden']){
+				}else{
+					loadTimeout = setTimeout(function(){loadData()}, REFRESH_PERIOD);
+				}
+			}, false);
+			
 			//intial nav
 			const jsMenuNode = document.querySelector('.menu');
 	  		const demoMenu = new Menu ({
@@ -61,7 +72,16 @@
 		  btnAddHomescreen.style.display = 'block';
 		});
 		
+		let loadTimeout;		
 		function loadData(){
+			var now = new Date();
+			//if less than 60s use cache
+			if(sessionStorage[DATA_CACHE] && 
+				sessionStorage[DATA_CACHE_TIME] && 
+				(now.getTime() - parseInt(sessionStorage[DATA_CACHE_TIME], 10) < 60000)){
+				parseData(JSON.parse(sessionStorage[DATA_CACHE]));
+				return;
+			}
 			document.querySelector('.loading').classList.toggle('hidden');
 			fetch(DATA_URL,{
   			  method:'GET',
@@ -73,13 +93,15 @@
 			    return res.json();
 			}).then(result => {
 			    parseData(result);
+			    sessionStorage[DATA_CACHE] = JSON.stringify(result);
+				sessionStorage[DATA_CACHE_TIME] = now.getTime();
 			    document.querySelector('.loading').classList.toggle('hidden');
-			    setTimeout(function(){loadData()}, REFRESH_PERIOD);
+			    loadTimeout = setTimeout(function(){loadData()}, REFRESH_PERIOD);
 			})
 			.catch(function(err) {
 			    alert(err);
 			    document.querySelector('.loading').classList.toggle('hidden');
-			    setTimeout(function(){loadData()}, REFRESH_PERIOD);
+			    loadTimeout = setTimeout(function(){loadData()}, REFRESH_PERIOD);
 			});
 		}
 		

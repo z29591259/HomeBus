@@ -48,6 +48,7 @@
     padding-left: 1em;
     width: 100%;
     box-sizing: border-box;
+  	align-items: center;
 }
 .r-link:active{
 	background-color: var(--rlinkActiveColor);
