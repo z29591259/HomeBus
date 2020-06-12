@@ -4,9 +4,13 @@
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 		<link rel="manifest" href="manifest.json" />
-		<link rel="stylesheet" href="nav.css?v=202006041" />
 		<title>一鍵公車</title>
 		<script>
+		const LAST_MODIFIED_DATE = '2020060121';
+		//prevent css cache not update
+		document.getElementsByTagName("head")[0].insertAdjacentHTML(
+    		'afterBegin',
+    		'<link rel="stylesheet" href="nav.css?v='+LAST_MODIFIED_DATE+'" />');
 		const REFRESH_PERIOD = 60*1000;
 		const DATA_URL = 'https://script.google.com/macros/s/AKfycbxVH6wsfiRs_u-GSLVKVoENVX_SfJ7wUSFEqTB_hDFleA4NzEY/exec?key=7dKw1ubRxz4EtL2EuN5ZWKZPT9GBeL6T';
 		const DATA_CACHE_TIME = 'data_cache_time';
@@ -144,7 +148,8 @@
 				'</div>';
 			}
 			document.getElementById('estimate_info').innerHTML = content;
-		}		
+		}
+		
 		function getStatus(status, next_time){
 			if(status === 1){
 				if(next_time == undefined){ return '尚未發車';}
@@ -159,6 +164,11 @@
 			}else if(status === 4){
 				return '今日未營運';
 			}
+		}
+		
+		function assignSvgUrl(svg){
+			var use = svg.getElementsByTagName("use")[0];
+			use.href.baseVal = 'icon.svg?v='+LAST_MODIFIED_DATE+'#' + svg.dataset.svgId;
 		}
 		
 		function shareUrl(){
@@ -309,7 +319,7 @@
 		<div>
 			<input id="add_homescreen" type="button" value="新增到桌面"/>
 		</div>
-		<svg class="svg-icon loading hidden" xmlns="http://www.w3.org/2000/svg">
+		<svg class="svg-icon loading hidden" xmlns="http://www.w3.org/2000/svg" onload="">
 			<use xlink:href="icon.svg#loading"></use>
 		</svg>
 	</div>
@@ -318,36 +328,36 @@
     		<ul class="r-list menu__list">
 	      		<li class="menu__group">
 		        	<a href="https://ptx.transportdata.tw/PTX" class="r-link menu__link">
-		        		<svg class="svg-icon" xmlns="http://www.w3.org/2000/svg">
-							<use xlink:href="icon.svg#bus"></use>
+		        		<svg class="svg-icon" xmlns="http://www.w3.org/2000/svg" data-svg-id="bus" onload="assignSvgUrl(this);">
+							<use xlink:href=""></use>
 						</svg>交通部PTX
 		        	</a>
 		        </li>
 		        <li class="menu__group">
 		        	<a href="https://woodloch.blog" class="r-link menu__link">
-		        		<svg class="svg-icon" xmlns="http://www.w3.org/2000/svg">
-							<use xlink:href="icon.svg#user"></use>
+		        		<svg class="svg-icon" xmlns="http://www.w3.org/2000/svg" data-svg-id="user" onload="assignSvgUrl(this);">
+							<use xlink:href=""></use>
 						</svg>木澤
 		        	</a>
 		        </li>
 		        <li class="menu__group">
 		        	<a href="https://woodlochhome.wordpress.com/2020/05/30/oneclickbus/" class="r-link menu__link">
-		        		<svg class="svg-icon" xmlns="http://www.w3.org/2000/svg">
-							<use xlink:href="icon.svg#link"></use>
+		        		<svg class="svg-icon" xmlns="http://www.w3.org/2000/svg" data-svg-id="link" onload="assignSvgUrl(this);">
+							<use xlink:href=""></use>
 						</svg>部落格
 		        	</a>
 		        </li>
 		        <li class="menu__group">
 		        	<a href="mailto:admin@woodloch.blog" class="r-link menu__link">
-		        		<svg class="svg-icon" xmlns="http://www.w3.org/2000/svg">
-							<use xlink:href="icon.svg#mail"></use>
+		        		<svg class="svg-icon" xmlns="http://www.w3.org/2000/svg" data-svg-id="mail" onload="assignSvgUrl(this);">
+							<use xlink:href=""></use>
 						</svg>聯繫我
 		        	</a>
 		        </li>
 		        <li class="menu__group">
 		        	<a href="javascript:void(0);" onclick="shareUrl();" class="r-link menu__link">
-		        		<svg class="svg-icon" xmlns="http://www.w3.org/2000/svg">
-							<use xlink:href="icon.svg#share"></use>
+		        		<svg class="svg-icon" xmlns="http://www.w3.org/2000/svg" data-svg-id="share" onload="assignSvgUrl(this);">
+							<use xlink:href=""></use>
 						</svg>分享給朋友
 		        	</a>
 		        </li>

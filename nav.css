@@ -297,7 +297,7 @@ SETTINGS
   --rlinkActiveColor: #d0e6ff;
   --menuCircleSize: 6em;
   --menuCircleBgColor: var(--colorMain);
-  --menuHamburgerWidth: 1.28em;
-  --menuHamburgerHeight: 2em;
+  --menuHamburgerWidth: 1.68em;
+  --menuHamburgerHeight: 1.2em;
   --menuHamburgerBgColor: var(--colorWhite);
 }
