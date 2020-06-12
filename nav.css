@@ -142,7 +142,7 @@ MENU STYLES
   position: fixed;
   bottom: 0;
   left: 0;
-  z-index: 9998;
+  z-index: 999;
 }
 
 .menu__nav{
@@ -295,9 +295,9 @@ SETTINGS
   --colorMain: #4557bb;
   --rLinkTextColor: var(--colorWhite);
   --rlinkActiveColor: #d0e6ff;
-  --menuCircleSize: 100px;
+  --menuCircleSize: 6em;
   --menuCircleBgColor: var(--colorMain);
-  --menuHamburgerWidth: 28px;
-  --menuHamburgerHeight: 20px;
+  --menuHamburgerWidth: 1.28em;
+  --menuHamburgerHeight: 2em;
   --menuHamburgerBgColor: var(--colorWhite);
 }

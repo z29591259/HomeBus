@@ -11,6 +11,11 @@
 		const DATA_URL = 'https://script.google.com/macros/s/AKfycbxVH6wsfiRs_u-GSLVKVoENVX_SfJ7wUSFEqTB_hDFleA4NzEY/exec?key=7dKw1ubRxz4EtL2EuN5ZWKZPT9GBeL6T';
 		const DATA_CACHE_TIME = 'data_cache_time';
 		const DATA_CACHE = 'data_cache';
+		
+		//for share API
+		const shareData = {
+  			url: window.location.href
+		};
 		window.addEventListener('load', function(){
 			loadData();
 			
@@ -156,6 +161,43 @@
 			}
 		}
 		
+		function shareUrl(){
+			if (navigator.share) {
+			  	try {
+			    	navigator.share(shareData);
+				} catch (err) {
+				    const { name, message } = err;
+				    if (name === 'AbortError') {
+				      console.log('您已取消分享此訊息');
+				    } else {
+				      console.log('發生錯誤', err);
+				    }
+				}
+			} else {
+			  copy(window.location.href);
+			}
+			document.querySelector('.menu__hamburger').dispatchEvent(new Event('click'));
+			showToast('網址複製完成');
+		}
+		
+		function copy(text){
+			const input = document.createElement('input');
+			input.value = text;
+			document.body.appendChild(input);
+			input.select();
+			if (document.execCommand('Copy')) {
+			   	document.execCommand('Copy');
+			}
+			document.body.removeChild(input);
+		}
+		
+		function showToast(text) {
+		  var x = document.getElementById("toast");
+		  x.innerText = text;
+		  x.classList.toggle('show');
+		  setTimeout(function(){ x.classList.toggle('show'); }, 3000);
+		}
+		
 		//from https://codepen.io/melnik909/pen/JpJPYp
 		class Menu {
     		constructor(settings) {
@@ -223,13 +265,38 @@
 		}
 		.hidden { display: none; }
 		
-		@keyframes spin {
+		@keyframes spin{
 		  0% {
 		    transform: rotate(0deg);
 		  }
 		  100% {
 		    transform: rotate(-360deg);
 		  }
+		}
+		
+		#toast {
+		  min-width: 250px; 	  
+		  background-color: #333; 
+		  color: #fff; 
+		  text-align: center; 
+		  border-radius: 2px; 
+		  padding: 16px; 
+		  position: fixed; 
+		  z-index: 1000; /* need to higher than .menu in nav.css */
+		  left: 50%; /* Center the toast */
+		  transform: translatex(-50%);
+		  opacity: 0;
+		  bottom: calc(var(--toastBottom) * -1 );
+		  transition: bottom .5s, opacity .5s;/* move with animation */
+		}
+		
+		#toast.show {
+		  opacity: 1;
+		  bottom: var(--toastBottom);
+		  transition: bottom .5s, opacity .5s;/* move with animation */
+		}
+		:root{
+			--toastBottom: 3.2em;
 		}
 		</style>
 	</head>
@@ -277,6 +344,13 @@
 						</svg>聯繫我
 		        	</a>
 		        </li>
+		        <li class="menu__group">
+		        	<a href="javascript:void(0);" onclick="shareUrl();" class="r-link menu__link">
+		        		<svg class="svg-icon" xmlns="http://www.w3.org/2000/svg">
+							<use xlink:href="icon.svg#share"></use>
+						</svg>分享給朋友
+		        	</a>
+		        </li>
 	    	</ul>
   		</nav>
   		<div class="menu__toggle">
@@ -287,5 +361,6 @@
     		</button>
   		</div>  
 	</div>
+	<div id="toast">Some text some message..</div>
 	</body>
 </html>
