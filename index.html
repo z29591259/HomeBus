@@ -184,10 +184,10 @@
 				    }
 				}
 			} else {
-			  copy(window.location.href);
+			  	copy(window.location.href);
+				showToast('網址複製完成');
 			}
 			document.querySelector('.menu__hamburger').dispatchEvent(new Event('click'));
-			showToast('網址複製完成');
 		}
 		
 		function copy(text){
