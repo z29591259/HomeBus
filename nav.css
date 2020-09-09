@@ -192,7 +192,11 @@ MENU STYLES
   height: 1em;
   font-size: var(--uiMenuCircleSize); /* 1 */
 
-  background-color: var(--uiMenuCircleBgColor);
+  /*old color style*/
+  /*background-color: var(--uiMenuCircleBgColor);*/
+  background-image: linear-gradient(45deg, rgba(187, 187, 187,0.04) 0%, rgba(187, 187, 187,0.04) 50%,rgba(86, 86, 86,0.04) 50%, rgba(86, 86, 86,0.04) 100%),linear-gradient(135deg, rgba(166, 166, 166,0.04) 0%, rgba(166, 166, 166,0.04) 50%,rgba(92, 92, 92,0.04) 50%, rgba(92, 92, 92,0.04) 100%),linear-gradient(90deg, rgb(20,20,20),rgb(20,20,20)); 
+  background-size: 142px 142px;
+  
   border-radius: 50%;
 
   position: absolute;
