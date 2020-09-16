@@ -6,21 +6,28 @@
 		<link rel="manifest" href="manifest.json" />
 		<title>一鍵公車</title>
 		<script>
-		const LAST_MODIFIED_DATE = '2020090091';
+		const LAST_MODIFIED_DATE = '2020091701';
 		//prevent css cache not update
 		document.getElementsByTagName("head")[0].insertAdjacentHTML(
     		'afterBegin',
     		'<link rel="stylesheet" href="nav.css?v='+LAST_MODIFIED_DATE+'" />');
 		const REFRESH_PERIOD = 60*1000;
-		const DATA_URL = 'https://script.google.com/macros/s/AKfycbxVH6wsfiRs_u-GSLVKVoENVX_SfJ7wUSFEqTB_hDFleA4NzEY/exec?key=7dKw1ubRxz4EtL2EuN5ZWKZPT9GBeL6T';
-		const DATA_CACHE_TIME = 'data_cache_time';
-		const DATA_CACHE = 'data_cache';
+		const URL = 'https://script.google.com/macros/s/AKfycbxVH6wsfiRs_u-GSLVKVoENVX_SfJ7wUSFEqTB_hDFleA4NzEY/exec?key=7dKw1ubRxz4EtL2EuN5ZWKZPT9GBeL6T';
+		const URL_DATA = URL + '&action=get_bus';
+		const URL_INFO = URL + '&action=get_info';
+		const CACHE_DATA_TIME = 'cache_data_time';
+		const CACHE_DATA = 'cache_data';
+		const CACHE_INFO = 'cache_info';
+		const CACHE_INFO_TIME = 'cache_info_time';
+		
+		let info = {title:''};
 		
 		//for share API
 		const shareData = {
   			url: window.location.href
 		};
 		window.addEventListener('load', function(){
+			loadInfo();
 			loadData();
 			
 			if ('serviceWorker' in navigator) {
@@ -81,18 +88,53 @@
 		  btnAddHomescreen.style.display = 'block';
 		});
 		
+		function loadInfo(){
+			let now = new Date();
+			//if less than 300s use cache
+			if(localStorage[CACHE_INFO] && 
+				localStorage[CACHE_INFO_TIME] && 
+				(now.getTime() - parseInt(localStorage[CACHE_INFO_TIME], 10) < 300000)){
+				info = JSON.parse(localStorage[CACHE_INFO]);
+				updateInfo();
+				return;
+			}
+			
+			fetch(URL_INFO,{
+  			  method:'GET',
+			  headers: {
+			    'Content-Type': 'application/x-www-form-urlencoded; charset=utf-8'
+			  }
+			})
+			.then(res => {
+			    return res.json();
+			}).then(result => {
+				info = result;
+			    updateInfo();
+			    localStorage[CACHE_INFO] = info;
+				localStorage[CACHE_INFO_TIME] = now.getTime();
+			})
+			.catch(function(err) {
+			    console.log(err);
+			    //loadInfo();
+			});
+		}
+		
+		function updateInfo(){
+			document.querySelector('#title').innerText = info['title'];
+		}
+		
 		let loadTimeout;		
 		function loadData(){
-			var now = new Date();
+			let now = new Date();
 			//if less than 60s use cache
-			if(localStorage[DATA_CACHE] && 
-				localStorage[DATA_CACHE_TIME] && 
-				(now.getTime() - parseInt(localStorage[DATA_CACHE_TIME], 10) < 60000)){
-				parseData(JSON.parse(localStorage[DATA_CACHE]));
+			if(localStorage[CACHE_DATA] && 
+				localStorage[CACHE_DATA_TIME] && 
+				(now.getTime() - parseInt(localStorage[CACHE_DATA_TIME], 10) < 60000)){
+				parseData(JSON.parse(localStorage[CACHE_DATA]));
 				return;
 			}
 			document.querySelector('.loading').classList.toggle('hidden');
-			fetch(DATA_URL,{
+			fetch(URL_DATA,{
   			  method:'GET',
 			  headers: {
 			    'Content-Type': 'application/x-www-form-urlencoded; charset=utf-8'
@@ -102,8 +144,8 @@
 			    return res.json();
 			}).then(result => {
 			    parseData(result);
-			    localStorage[DATA_CACHE] = JSON.stringify(result);
-				localStorage[DATA_CACHE_TIME] = now.getTime();
+			    localStorage[CACHE_DATA] = JSON.stringify(result);
+				localStorage[CACHE_DATA_TIME] = now.getTime();
 			    document.querySelector('.loading').classList.toggle('hidden');
 			    loadTimeout = setTimeout(function(){loadData()}, REFRESH_PERIOD);
 			})
@@ -153,9 +195,9 @@
 		function getStatus(status, next_time){
 			if(status === 1){
 				if(next_time == undefined){ return '尚未發車';}
-				var time = new Date(next_time);
-				var hour = time.getHours() < 10 ? '0'+time.getHours() : time.getHours();
-				var minute = time.getMinutes() < 10 ? '0'+time.getMinutes() : time.getMinutes();
+				let time = new Date(next_time);
+				let hour = time.getHours() < 10 ? '0'+time.getHours() : time.getHours();
+				let minute = time.getMinutes() < 10 ? '0'+time.getMinutes() : time.getMinutes();
 				return hour + ':' + minute + '發車';
 			}else if(status === 2){
 				return '交管不停靠';
@@ -167,7 +209,7 @@
 		}
 		
 		function assignSvgUrl(svg){
-			var use = svg.getElementsByTagName("use")[0];
+			let use = svg.getElementsByTagName("use")[0];
 			use.href.baseVal = 'icon.svg?v='+LAST_MODIFIED_DATE+'#' + svg.dataset.svgId;
 		}
 		
@@ -202,7 +244,7 @@
 		}
 		
 		function showToast(text) {
-		  var x = document.getElementById("toast");
+		  let x = document.getElementById("toast");
 		  x.innerText = text;
 		  x.classList.toggle('show');
 		  setTimeout(function(){ x.classList.toggle('show'); }, 3000);
@@ -296,13 +338,13 @@
 		  left: 50%; /* Center the toast */
 		  transform: translatex(-50%);
 		  opacity: 0;
-		  bottom: calc(var(--toastBottom) * -1 );
+		  bottom: calc(let(--toastBottom) * -1 );
 		  transition: bottom .5s, opacity .5s;/* move with animation */
 		}
 		
 		#toast.show {
 		  opacity: 1;
-		  bottom: var(--toastBottom);
+		  bottom: let(--toastBottom);
 		  transition: bottom .5s, opacity .5s;/* move with animation */
 		}
 		:root{
@@ -313,7 +355,7 @@
 	<body>
 	<div class="page">
 		<center>
-			<h1>一鍵公車</h1>
+			<h1 id="title"></h1>
 		</center>
 		<div id="estimate_info">讀取中...</div>
 		<div>
