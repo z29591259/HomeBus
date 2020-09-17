@@ -110,7 +110,7 @@
 			}).then(result => {
 				info = result;
 			    updateInfo();
-			    localStorage[CACHE_INFO] = info;
+			    localStorage[CACHE_INFO] = JSON.stringify(info);
 				localStorage[CACHE_INFO_TIME] = now.getTime();
 			})
 			.catch(function(err) {
@@ -355,7 +355,7 @@
 	<body>
 	<div class="page">
 		<center>
-			<h1 id="title"></h1>
+			<h1 id="title">&nbsp;</h1>
 		</center>
 		<div id="estimate_info">讀取中...</div>
 		<div>
